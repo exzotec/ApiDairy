@@ -18,12 +18,6 @@ namespace ApiDairy.Controllers
             db = context;
         }
 
-        /*[HttpGet]
-        public IActionResult Login()
-        {
-            return View();
-        }*/
-
         [HttpPost("/token")]
         public IActionResult Token(string login, string password)
         {
@@ -72,55 +66,5 @@ namespace ApiDairy.Controllers
             // если пользователя не найдено
             return null;
         }
-
-        /*
-        [HttpGet]
-        public IActionResult Register()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                Users user = await db.Users.FirstOrDefaultAsync(user => user.Login == model.Login);
-
-                if (user == null)
-                {
-                    // добавляем пользователя в бд
-                    db.Users.Add(new Users { Login = model.Login, Password = model.Password, Role = model.Role }); 
-                    await db.SaveChangesAsync();
-
-                    await Authenticate(model.Login, model.Role); // аутентификация
-
-                    return RedirectToAction("Index", "Home");
-                }
-                else
-                    ModelState.AddModelError("", "Некорректные логин и(или) пароль");
-            }
-            return View(model);
-        }
-
-        private async Task Authenticate(string Login, string Role)
-        {
-            // создаем один claim
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimsIdentity.DefaultNameClaimType, Login, ClaimsIdentity.DefaultRoleClaimType, Role)
-            };
-            // создаем объект ClaimsIdentity
-            ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
-            // установка аутентификационных куки
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
-        }
-
-        public async Task<IActionResult> Logout()
-        {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Login", "Account");
-        }*/
     }
 }
