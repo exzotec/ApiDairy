@@ -11,9 +11,9 @@ namespace ApiDairy.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserContext db;
+        private readonly DataContext db;
 
-        public AccountController(UserContext context)
+        public AccountController(DataContext context)
         {
             db = context;
         }
