@@ -1,147 +1,120 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using ApiDairy.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using ApiDairy.Data.Interfaces;
+using ApiDairy.Data.Repositories;
 
 namespace ApiDairy.Controllers
 {
     [Route("api/headteacher")]
     [Authorize(Roles = "headteacher, admin")]
     [ApiController]
-    public class HeadTeacherController : ControllerBase
+    public class HeadTeacherController : Controller
     {
-        private readonly DataContext db;
+        IBaseRepository<User> dbUser;
+        IBaseRepository<Office> dbOffice;
+        IBaseRepository<Class> dbClass;
+        IBaseRepository<Subject> dbSub;
 
-        public HeadTeacherController(DataContext context)
+        public HeadTeacherController()
         {
-            db = context;
+            dbUser = new UserRepository();
+            dbOffice = new OfficeRepository();
+            dbClass = new ClassRepository();
+            dbSub = new SubjectRepository();
         }
 
+        //Get Info
+        #region Info
+        [Route("GetInfo")]
         [HttpGet]
         public IActionResult Info()
         {
             return Content("Создание пользователя(api/headteacher/createUser). Редактирование пользователя(api/headteacher/editUser). Удаление пользователя(api/headteacher/deleteUser).");
         }
+        #endregion
 
         //CED on User
         #region
 
-        [Route("all")]
+        [Route("GetAll")]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetAll()
+        public ActionResult<IEnumerable<User>> GetAll()
         {
-            return await db.Users.ToListAsync();
+            return View(dbUser.GetList());
         }
 
         [Route("createUser")]
         [HttpPost]
-        public async Task<ActionResult<User>> AddUser(User user)
+        public ActionResult Create(User user)
         {
-            if (user == null)
-                return BadRequest();
-
-            if (db.Users.Any(u => u.Login == user.Login))
-                return BadRequest(new { errorText = "Пользователь с таким логином уже существует" });
-
-            db.Users.Add(new User { UserId = Guid.NewGuid().ToString(), Role = user.Role, Login = user.Login, Password = "" });
-            await db.SaveChangesAsync();
-            return Ok(user);
+            if (ModelState.IsValid)
+            {
+                dbUser.Create(user);
+                dbUser.Save();
+                return RedirectToAction("Index");
+            }
+            return View(user);
         }
 
         [Route("editUser")]
-        [HttpPut]
-        public async Task<ActionResult<User>> PutUser(User user)
+        [HttpPost]
+        public ActionResult Edit(User user)
         {
-            if (user == null)
+            if (ModelState.IsValid)
             {
-                return BadRequest();
+                dbUser.Update(user);
+                dbUser.Save();
+                return RedirectToAction("Index");
             }
-            if (!db.Users.Any(u => u.UserId == user.UserId))
-            {
-                return NotFound();
-            }
-
-            db.Update(user);
-            await db.SaveChangesAsync();
-
-            return Ok(user);
+            return View(user);
         }
 
         [Route("deleteUser")]
         [HttpPost]
-        public async Task<IActionResult> Delete(User user)
+        public ActionResult DeleteUserS(int id)
         {
-            if (user != null)
-            {
-                User u = await db.Users.FirstOrDefaultAsync(u => u.UserId == u.UserId);
-                if (u != null)
-                {
-                    db.Users.Remove(u);
-                    await db.SaveChangesAsync();
-                    return Ok(u);
-                }
-            }
-            return NotFound();
+            dbUser.Delete(id);
+            return RedirectToAction("Index");
         }
 
-        #endregion
+        #endregion 
 
         //CED Office
         #region
         [Route("createOffice")]
         [HttpPost]
-        public async Task<ActionResult<Office>> AddOffice(Office office)
+        public ActionResult Create(Office office)
         {
-            if (office == null)
-                return BadRequest();
-
-            if (db.Offices.Any(o => o.Number == office.Number))
-                return BadRequest(new { errorText = "Кабинет с таким номером уже существует" });
-
-            db.Offices.Add(new Office { OfficeId = Guid.NewGuid().ToString(), Number = office.Number });
-            await db.SaveChangesAsync();
-            return Ok(office);
+            if (ModelState.IsValid)
+            {
+                dbOffice.Create(office);
+                dbOffice.Save();
+                return RedirectToAction("Index");
+            }
+            return View(office);
         }
 
         [Route("editOffice")]
-        [HttpPut]
-        public async Task<ActionResult<Office>> PutOffice(Office office)
+        [HttpPost]
+        public ActionResult Edit(Office office)
         {
-            if (office == null)
+            if (ModelState.IsValid)
             {
-                return BadRequest();
+                dbOffice.Update(office);
+                dbOffice.Save();
+                return RedirectToAction("Index");
             }
-            if (!db.Offices.Any(o => o.OfficeId == office.OfficeId))
-            {
-                return NotFound();
-            }
-
-            db.Update(office);
-            await db.SaveChangesAsync();
-
-            return Ok(office);
+            return View(office);
         }
 
         [Route("deleteOffice")]
         [HttpPost]
-        public async Task<IActionResult> Delete(Office office)
+        public ActionResult DeleteOffice(int id)
         {
-            if (office != null)
-            {
-                Office o = await db.Offices.FirstOrDefaultAsync(o => o.OfficeId == o.OfficeId);
-                if (o != null)
-                {
-                    db.Offices.Remove(o);
-                    await db.SaveChangesAsync();
-                    return Ok(o);
-                }
-            }
-            return NotFound();
+            dbOffice.Delete(id);
+            return RedirectToAction("Index");
         }
         #endregion
 
@@ -149,108 +122,73 @@ namespace ApiDairy.Controllers
         #region
         [Route("createClass")]
         [HttpPost]
-        public async Task<ActionResult<Class>> AddClass(Class @class)
+        public ActionResult Create(Class item)
         {
-            if (@class == null)
-                return BadRequest();
-
-            if (db.Classes.Any(c => c.Number == @class.Number && c.Letter == @class.Letter))
-                return BadRequest(new { errorText = "Такой класс уже существует" });
-
-            db.Classes.Add(new Class { ClassId = Guid.NewGuid().ToString(), Number = @class.Number, Letter = @class.Letter });
-            await db.SaveChangesAsync();
-            return Ok(@class);
+            if (ModelState.IsValid)
+            {
+                dbClass.Create(item);
+                dbClass.Save();
+                return RedirectToAction("Index");
+            }
+            return View(item);
         }
 
         [Route("editClass")]
         [HttpPut]
-        public async Task<ActionResult<Class>> PutClass(Class @class)
+        public ActionResult Edit(Class @class)
         {
-            if (@class == null)
+            if (ModelState.IsValid)
             {
-                return BadRequest();
+                dbClass.Update(@class);
+                dbClass.Save();
+                return RedirectToAction("Index");
             }
-            if (!db.Classes.Any(c => c.ClassId == @class.ClassId))
-            {
-                return NotFound();
-            }
-
-            db.Update(@class);
-            await db.SaveChangesAsync();
-
-            return Ok(@class);
+            return View(@class);
         }
 
         [Route("deleteClass")]
         [HttpPost]
-        public async Task<IActionResult> DeleteClass(Class @class)
+        public ActionResult DeleteClass(int id)
         {
-            if (@class != null)
-            {
-                Class c = await db.Classes.FirstOrDefaultAsync(c => c.ClassId == c.ClassId);
-                if (c != null)
-                {
-                    db.Classes.Remove(c);
-                    await db.SaveChangesAsync();
-                    return Ok(c);
-                }
-            }
-            return NotFound();
+            dbClass.Delete(id);
+            return RedirectToAction("Index");
         }
-
         #endregion
 
         //CED Subject
         #region
         [Route("createSubject")]
         [HttpPost]
-        public async Task<ActionResult<Subject>> AddSubject(Subject subject)
+        public ActionResult Create(Subject sub)
         {
-            if (subject == null)
-                return BadRequest();
-
-            if (db.Subjects.Any(s => s.Name == subject.Name))
-                return BadRequest(new { errorText = "Такой класс уже существует" });
-
-            db.Subjects.Add(new Subject { SubjectId = Guid.NewGuid().ToString(), Name = subject.Name });
-            await db.SaveChangesAsync();
-            return Ok(subject);
+            if (ModelState.IsValid)
+            {
+                dbSub.Create(sub);
+                dbSub.Save();
+                return RedirectToAction("Index");
+            }
+            return View(sub);
         }
 
         [Route("editSubject")]
         [HttpPut]
-        public async Task<ActionResult<Subject>> PutSubject(Subject subject)
+        public ActionResult Edit(Subject sub)
         {
-            if (subject == null)
+            if (ModelState.IsValid)
             {
-                return BadRequest();
+                dbSub.Update(sub);
+                dbSub.Save();
+                return RedirectToAction("Index");
             }
-            if (!db.Subjects.Any(s => s.SubjectId == subject.SubjectId))
-            {
-                return NotFound();
-            }
-
-            db.Update(subject);
-            await db.SaveChangesAsync();
-
-            return Ok(subject);
+            return View(sub);
         }
 
         [Route("deleteSubject")]
         [HttpPost]
-        public async Task<IActionResult> Delete(Subject sub)
+        public ActionResult DeleteSubject(int id)
         {
-            if (sub != null)
-            {
-                Subject subject = await db.Subjects.FirstOrDefaultAsync(s => s.SubjectId == sub.SubjectId);
-                if (subject != null)
-                {
-                    db.Subjects.Remove(subject);
-                    await db.SaveChangesAsync();
-                    return Ok(subject);
-                }
-            }
-            return NotFound();
+            dbSub.Delete(id);
+            return RedirectToAction("Index");
         }
         #endregion
     }

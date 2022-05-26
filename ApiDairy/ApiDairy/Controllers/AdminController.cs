@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ApiDairy.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ApiDairy.Data;
 
 namespace ApiDairy.Controllers
 {
