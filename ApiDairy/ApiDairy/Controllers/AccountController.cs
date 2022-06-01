@@ -10,6 +10,8 @@ using ApiDairy.Data;
 
 namespace ApiDairy.Controllers
 {
+    [ApiController]
+    [Route ("api/token")]
     public class AccountController : Controller
     {
         private readonly DataContext db;
@@ -19,10 +21,10 @@ namespace ApiDairy.Controllers
             db = context;
         }
 
-        [HttpPost("/token")]
-        public IActionResult Token(string login, string password)
+        [HttpPost]
+        public IActionResult Token(User user)
         {
-            var identity = GetIdentity(login, password);
+            var identity = GetIdentity(user.login, user.password);
             if (identity == null)
             {
                 return BadRequest(new { errorText = "Некорректные логин и(или) пароль." });
@@ -45,18 +47,19 @@ namespace ApiDairy.Controllers
                 login = identity.Name //?
             };
 
-            return Json(response);
+            return Ok(response);
         }
 
-        private ClaimsIdentity GetIdentity(string login, string password)
+        private ClaimsIdentity GetIdentity(string Login, string Password)
         {
-            User User = db.Users.FirstOrDefault(x => x.Login == login && x.Password == password);
-            if (User != null)
+            User user = db.users.FirstOrDefault(x => x.login == Login && x.password == Password);
+            Role userRole = db.roles.FirstOrDefault(r => r.roleid == user.roleid);
+            if (user != null)
             {
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimsIdentity.DefaultNameClaimType, User.Login),
-                    new Claim(ClaimsIdentity.DefaultRoleClaimType, User.Role)
+                    new Claim(ClaimsIdentity.DefaultNameClaimType, user.login),
+                    new Claim(ClaimsIdentity.DefaultRoleClaimType, user.role?.name)
                 };
                 ClaimsIdentity claimsIdentity =
                 new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,

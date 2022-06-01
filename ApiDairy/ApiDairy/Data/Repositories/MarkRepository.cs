@@ -8,46 +8,46 @@ using System.Threading.Tasks;
 
 namespace ApiDairy.Data.Repositories
 {
-    public class SubjectRepository : IBaseRepository<Subject>
+    public class MarkRepository : IBaseRepository<Mark>
     {
-        private DataContext dbSub;
+        private DataContext dbMark;
 
-        public SubjectRepository(DataContext _dbSub)
+        public MarkRepository(DataContext _dbMark)
         {
-            dbSub = _dbSub;
+            dbMark = _dbMark;
         }
 
         #region CRUD+
-        public void Create(Subject sub)
+        public void Create(Mark mark) //
         {
-            dbSub.Subjects.Add(sub);
+            dbMark.Marks.Add(mark);
         }
 
-        public void Delete(int id)
+        public void Delete(int id) //
         {
-            Subject s = dbSub.Subjects.Find(id);
-            if (s != null)
-                dbSub.Subjects.Remove(s);
+            Mark mark = dbMark.Marks.Find(id);
+            if (mark != null)
+                dbMark.Marks.Remove(mark);
         }
 
-        public Subject Get(string id)
+        public Mark Get(string id) //
         {
-            return dbSub.Subjects.Find(id);
+            return dbMark.Marks.Find(id);
         }
 
-        public async Task<ActionResult<IEnumerable<Subject>>> GetAll()
+        public async Task<ActionResult<IEnumerable<Mark>>> GetAll() //
         {
-            return await dbSub.Subjects.ToListAsync();
+            return await dbMark.Marks.ToListAsync();
         }
 
-        public void Save()
+        public void Save() //
         {
-            dbSub.SaveChanges();
+            dbMark.SaveChanges();
         }
 
-        public void Update(Subject sub)
+        public void Update(Mark mark) //
         {
-            dbSub.Entry(sub).State = EntityState.Modified;
+            dbMark.Entry(mark).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
         }
         #endregion
 
@@ -60,7 +60,7 @@ namespace ApiDairy.Data.Repositories
             {
                 if (disposing)
                 {
-                    dbSub.Dispose();
+                    dbMark.Dispose();
                 }
             }
             this.disposed = true;
@@ -72,5 +72,6 @@ namespace ApiDairy.Data.Repositories
             GC.SuppressFinalize(this);
         }
         #endregion
+
     }
 }

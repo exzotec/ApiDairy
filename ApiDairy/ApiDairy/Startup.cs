@@ -60,6 +60,9 @@ namespace ApiDairy
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseStatusCodePages("text/plain", "Error. Status code : {0}");
+
+            app.UseDefaultFiles();
             app.UseStaticFiles();
 
             app.UseRouting();
@@ -69,9 +72,7 @@ namespace ApiDairy
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllers();
             });
         }
     }

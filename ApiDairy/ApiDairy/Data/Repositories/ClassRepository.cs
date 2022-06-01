@@ -1,8 +1,10 @@
 ﻿using ApiDairy.Data.Interfaces;
 using ApiDairy.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ApiDairy.Data.Repositories
 {
@@ -10,9 +12,9 @@ namespace ApiDairy.Data.Repositories
     {
         private DataContext dbClass;
 
-        public ClassRepository()
+        public ClassRepository(DataContext _dbClass)
         {
-            this.dbClass = new DataContext();
+            dbClass = _dbClass;
         }
 
         #region CRUD+
@@ -28,14 +30,14 @@ namespace ApiDairy.Data.Repositories
                 dbClass.Classes.Remove(c);
         }
 
-        public Class Get(int id)
+        public Class Get(string id)
         {
             return dbClass.Classes.Find(id);
         }
 
-        public IEnumerable<Class> GetList()
+        public async Task<ActionResult<IEnumerable<Class>>> GetAll()
         {
-            return dbClass.Classes;
+            return await dbClass.Classes.ToListAsync();
         }
 
         public void Save()

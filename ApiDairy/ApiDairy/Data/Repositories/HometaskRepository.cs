@@ -6,48 +6,49 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+
 namespace ApiDairy.Data.Repositories
 {
-    public class UserRepository : IBaseRepository<User>
+    public class HometaskRepository : IBaseRepository<Hometask>
     {
-        private DataContext dbUser;
+        private DataContext dbHT;
 
-        public UserRepository(DataContext _dbUser)
+        public HometaskRepository(DataContext _dbHT)
         {
-            dbUser = _dbUser;
+            dbHT = _dbHT;
         }
 
         #region CRUD+
-        public void Create(User user) //
+        public void Create(Hometask hometask) //
         {
-            dbUser.users.Add(user);
+            dbHT.Hometasks.Add(hometask);
         }
 
         public void Delete(int id) //
         {
-            User user = dbUser.users.Find(id);
-            if (user != null)
-                dbUser.users.Remove(user);
+            Hometask hometask = dbHT.Hometasks.Find(id);
+            if (hometask != null)
+                dbHT.Hometasks.Remove(hometask);
         }
 
-        public User Get(string id) //
+        public Hometask Get(string id) //
         {
-            return dbUser.users.Find(id);
+            return dbHT.Hometasks.Find(id);
         }
 
-        public async Task<ActionResult<IEnumerable<User>>> GetAll() //
+        public async Task<ActionResult<IEnumerable<Hometask>>> GetAll() //
         {
-            return await dbUser.users.ToListAsync();
+            return await dbHT.Hometasks.ToListAsync();
         }
 
         public void Save() //
         {
-            dbUser.SaveChanges();
+            dbHT.SaveChanges();
         }
 
-        public void Update(User user) //
+        public void Update(Hometask hometask) //
         {
-            dbUser.Entry(user).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            dbHT.Entry(hometask).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
         }
         #endregion
 
@@ -60,7 +61,7 @@ namespace ApiDairy.Data.Repositories
             {
                 if (disposing)
                 {
-                    dbUser.Dispose();
+                    dbHT.Dispose();
                 }
             }
             this.disposed = true;
@@ -72,5 +73,6 @@ namespace ApiDairy.Data.Repositories
             GC.SuppressFinalize(this);
         }
         #endregion
+
     }
 }

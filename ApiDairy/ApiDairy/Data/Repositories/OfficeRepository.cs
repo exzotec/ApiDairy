@@ -1,8 +1,10 @@
 ﻿using ApiDairy.Data.Interfaces;
 using ApiDairy.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ApiDairy.Data.Repositories
 {
@@ -10,9 +12,9 @@ namespace ApiDairy.Data.Repositories
     {
         private DataContext dbOffice;
 
-        public OfficeRepository()
+        public OfficeRepository(DataContext _dbOffice)
         {
-            this.dbOffice = new DataContext();
+            dbOffice = _dbOffice;
         }
 
         #region CRUD+
@@ -28,14 +30,14 @@ namespace ApiDairy.Data.Repositories
                 dbOffice.Offices.Remove(office);
         }
 
-        public Office Get(int id)
+        public Office Get(string id)
         {
             return dbOffice.Offices.Find(id);
         }
 
-        public IEnumerable<Office> GetList()
+        public async Task<ActionResult<IEnumerable<Office>>> GetAll()
         {
-            return dbOffice.Offices;
+            return await dbOffice.Offices.ToListAsync();
         }
 
         public void Save()

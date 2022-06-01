@@ -8,46 +8,46 @@ using System.Threading.Tasks;
 
 namespace ApiDairy.Data.Repositories
 {
-    public class UserRepository : IBaseRepository<User>
+    public class TimetableRepository : IBaseRepository<Timetable>
     {
-        private DataContext dbUser;
+        private DataContext dbTT;
 
-        public UserRepository(DataContext _dbUser)
+        public TimetableRepository(DataContext _dbTT)
         {
-            dbUser = _dbUser;
+            dbTT = _dbTT;
         }
 
         #region CRUD+
-        public void Create(User user) //
+        public void Create(Timetable timetable) //
         {
-            dbUser.users.Add(user);
+            dbTT.Timetables.Add(timetable);
         }
 
         public void Delete(int id) //
         {
-            User user = dbUser.users.Find(id);
-            if (user != null)
-                dbUser.users.Remove(user);
+            Timetable timetable = dbTT.Timetables.Find(id);
+            if (timetable != null)
+                dbTT.Timetables.Remove(timetable);
         }
 
-        public User Get(string id) //
+        public Timetable Get(string id) //
         {
-            return dbUser.users.Find(id);
+            return dbTT.Timetables.Find(id);
         }
 
-        public async Task<ActionResult<IEnumerable<User>>> GetAll() //
+        public async Task<ActionResult<IEnumerable<Timetable>>> GetAll() //
         {
-            return await dbUser.users.ToListAsync();
+            return await dbTT.Timetables.ToListAsync();
         }
 
         public void Save() //
         {
-            dbUser.SaveChanges();
+            dbTT.SaveChanges();
         }
 
-        public void Update(User user) //
+        public void Update(Timetable timetable) //
         {
-            dbUser.Entry(user).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            dbTT.Entry(timetable).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
         }
         #endregion
 
@@ -60,7 +60,7 @@ namespace ApiDairy.Data.Repositories
             {
                 if (disposing)
                 {
-                    dbUser.Dispose();
+                    dbTT.Dispose();
                 }
             }
             this.disposed = true;
@@ -72,5 +72,6 @@ namespace ApiDairy.Data.Repositories
             GC.SuppressFinalize(this);
         }
         #endregion
+
     }
 }
