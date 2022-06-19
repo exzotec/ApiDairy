@@ -5,50 +5,49 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace ApiDairy.Data.Repositories
 {
-    public class KlassRepository : IBaseRepository<Klass>
+    public class ClassRepository : IBaseRepository<Class>
     {
-        private DataContext dbKlass;
+        private DataContext dbClass;
 
-        public KlassRepository(DataContext _dbKlass)
+        public ClassRepository(DataContext _dbClass)
         {
-            dbKlass = _dbKlass;
+            dbClass = _dbClass;
         }
 
         #region CRUD+
-        public void Create(Klass @class)
+        public void Create(Class @class)
         {
-            dbKlass.Classes.Add(@class);
+            dbClass.Classes.Add(@class);
         }
 
         public void Delete(int id)
         {
-            Klass c = dbKlass.Classes.Find(id);
+            Class c = dbClass.Classes.Find(id);
             if (c != null)
-                dbKlass.Classes.Remove(c);
+                dbClass.Classes.Remove(c);
         }
 
-        public Klass Get(string id)
+        public Class Get(string id)
         {
-            return dbKlass.Classes.Find(id);
+            return dbClass.Classes.Find(id);
         }
 
-        public async Task<ActionResult<IEnumerable<Klass>>> GetAll()
+        public async Task<ActionResult<IEnumerable<Class>>> GetAll()
         {
-            return await dbKlass.Classes.ToListAsync();
+            return await dbClass.Classes.ToListAsync();
         }
 
         public void Save()
         {
-            dbKlass.SaveChanges();
+            dbClass.SaveChanges();
         }
 
-        public void Update(Klass @class)
+        public void Update(Class @class)
         {
-            dbKlass.Entry(@class).State = EntityState.Modified;
+            dbClass.Entry(@class).State = EntityState.Modified;
         }
         #endregion
 
@@ -61,7 +60,7 @@ namespace ApiDairy.Data.Repositories
             {
                 if (disposing)
                 {
-                    dbKlass.Dispose();
+                    dbClass.Dispose();
                 }
             }
             this.disposed = true;

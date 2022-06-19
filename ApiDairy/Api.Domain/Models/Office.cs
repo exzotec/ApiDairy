@@ -3,12 +3,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ApiDairy.Models
 {
-    //предмет
-    public class Subject
+    // кабинет
+    public class Office
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int SubjectId { get; set; }
-        public string Name { get; set; }
+        public string OfficeId { get; set; }
+        public int Number { get; set; }
     }
 }

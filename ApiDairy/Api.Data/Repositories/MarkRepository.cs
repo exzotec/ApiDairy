@@ -5,50 +5,49 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace ApiDairy.Data.Repositories
 {
-    public class KlassRepository : IBaseRepository<Klass>
+    public class MarkRepository : IBaseRepository<Mark>
     {
-        private DataContext dbKlass;
+        private DataContext dbMark;
 
-        public KlassRepository(DataContext _dbKlass)
+        public MarkRepository(DataContext _dbMark)
         {
-            dbKlass = _dbKlass;
+            dbMark = _dbMark;
         }
 
         #region CRUD+
-        public void Create(Klass @class)
+        public void Create(Mark mark) //
         {
-            dbKlass.Classes.Add(@class);
+            dbMark.Marks.Add(mark);
         }
 
-        public void Delete(int id)
+        public void Delete(int id) //
         {
-            Klass c = dbKlass.Classes.Find(id);
-            if (c != null)
-                dbKlass.Classes.Remove(c);
+            Mark mark = dbMark.Marks.Find(id);
+            if (mark != null)
+                dbMark.Marks.Remove(mark);
         }
 
-        public Klass Get(string id)
+        public Mark Get(string id) //
         {
-            return dbKlass.Classes.Find(id);
+            return dbMark.Marks.Find(id);
         }
 
-        public async Task<ActionResult<IEnumerable<Klass>>> GetAll()
+        public async Task<ActionResult<IEnumerable<Mark>>> GetAll() //
         {
-            return await dbKlass.Classes.ToListAsync();
+            return await dbMark.Marks.ToListAsync();
         }
 
-        public void Save()
+        public void Save() //
         {
-            dbKlass.SaveChanges();
+            dbMark.SaveChanges();
         }
 
-        public void Update(Klass @class)
+        public void Update(Mark mark) //
         {
-            dbKlass.Entry(@class).State = EntityState.Modified;
+            dbMark.Entry(mark).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
         }
         #endregion
 
@@ -61,7 +60,7 @@ namespace ApiDairy.Data.Repositories
             {
                 if (disposing)
                 {
-                    dbKlass.Dispose();
+                    dbMark.Dispose();
                 }
             }
             this.disposed = true;

@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using ApiDairy.Data;
+using ApiDairy.Services;
 
 namespace ApiDairy
 {
@@ -50,6 +51,11 @@ namespace ApiDairy
                         };
                     });
             services.AddControllersWithViews();
+
+            // внедрение зависимости UserService
+            services.AddTransient<HometaskService>();
+            // добавление кэширования
+            services.AddMemoryCache();
 
         }
 

@@ -9,14 +9,14 @@ namespace ApiDairy.Data
         public DbSet<User> users { get; set; }
         public DbSet<Role> roles { get; set; }
 
-        public DbSet<Klass> Klasses { get; set; }
+        public DbSet<Class> Classes { get; set; }
         public DbSet<Office> Offices { get; set; }
         public DbSet<Timetable> Timetables { get; set; }
         public DbSet<Subject> Subjects { get; set; }
         public DbSet<Mark> Marks { get; set; }
         public DbSet<Hometask> Hometasks { get; set; }
 
-        public DataContext()
+        public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
             Database.EnsureCreated();
         }

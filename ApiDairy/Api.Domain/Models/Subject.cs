@@ -8,7 +8,7 @@ namespace ApiDairy.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int SubjectId { get; set; }
+        public string SubjectId { get; set; }
         public string Name { get; set; }
     }
 }

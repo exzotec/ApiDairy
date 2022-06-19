@@ -1,12 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using ApiDairy.Models;
-using System.Collections.Generic;
+﻿using ApiDairy.Data;
 using ApiDairy.Data.Interfaces;
 using ApiDairy.Data.Repositories;
-using ApiDairy.Data;
+using ApiDairy.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
+using Npgsql;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 
 namespace ApiDairy.Controllers
@@ -16,12 +18,14 @@ namespace ApiDairy.Controllers
     [ApiController]
     public class HeadTeacher : ControllerBase
     {
+        #region datacontext
         IBaseRepository<User> dbUser;
 
         IBaseRepository<Office> dbOffice;
-        IBaseRepository<Class> dbClass;
+        IBaseRepository<Klass> dbKlass;
         IBaseRepository<Subject> dbSub;
         IBaseRepository<Timetable> dbTT;
+        IBaseRepository<Mark> dbMark;
 
         DataContext context;
 
@@ -32,12 +36,25 @@ namespace ApiDairy.Controllers
             dbUser = new UserRepository(context);
 
             dbOffice = new OfficeRepository(context);
-            dbClass = new ClassRepository(context);
+            dbKlass = new KlassRepository(context);
             dbSub = new SubjectRepository(context);
             dbTT = new TimetableRepository(context);
+            dbMark = new MarkRepository(context);
         }
 
-        //Get Info
+        #endregion
+
+        /*[Route("GetExcel")]
+        [HttpGet]
+        public IActionResult GetExcel()
+        {
+            Excel.Application
+                        // Start a new workbook in Excel.
+                        m_objExcel = new Excel.Application();
+            m_objBooks = (Excel.Workbooks)m_objExcel.Workbooks;
+            m_objBook = (Excel._Workbook)(m_objBooks.Add(m_objOpt));
+        }*/
+
         #region Info
         [Route("GetInfo")]
         [HttpGet]
@@ -47,8 +64,7 @@ namespace ApiDairy.Controllers
         }
         #endregion
 
-        //CED on User
-        #region
+        #region CED on User
 
         [Route("GetAll")]
         [HttpGet]
@@ -67,7 +83,12 @@ namespace ApiDairy.Controllers
             if (context.users.Any(x => x.login == user.login))
                 return BadRequest(new { errorText = "Пользователь с таким логином уже существует" });
 
-            dbUser.Create(new User { login = user.login, password = user.password, roleid = user.roleid });
+            dbUser.Create(new User    { login = user.login, 
+                                        password = user.password, 
+                                        roleid = user.roleid, 
+                                        first_name = user.first_name, 
+                                        middle_name = user.middle_name,
+                                        last_name = user.last_name });
             dbUser.Save();
             return Ok(user);
         }
@@ -91,23 +112,18 @@ namespace ApiDairy.Controllers
             return Ok(user);
         }
 
-        [Route("deleteUser")]
-        [HttpPost]
+        [HttpDelete("deleteUser/{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            if (id != null)
-            {
-                dbUser.Delete(id);
-                await context.SaveChangesAsync();
-                return Ok();
-            }
-            return NotFound();
+            dbUser.Delete(id);
+            await context.SaveChangesAsync();
+            return Ok();
         }
 
         #endregion
 
-        //CED Office
-        #region
+        #region CED Office
+
         [Route("createOffice")]
         [HttpPost]
         public async Task<ActionResult<Office>> CreateOffice(Office office)
@@ -146,68 +162,58 @@ namespace ApiDairy.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteOffice(int id)
         {
-            if (id != null)
-            {
                 dbOffice.Delete(id);
                 await context.SaveChangesAsync();
                 return Ok();
-            }
-            return NotFound();
         }
         #endregion
 
-        //CED class
-        #region
+        #region CED class
         [Route("createClass")]
         [HttpPost]
-        public async Task<ActionResult<Class>> CreateClass(Class @class)
+        public async Task<ActionResult<Klass>> CreateClass(Klass @class)
         {
             if (@class == null)
                 return BadRequest();
 
-            if (context.Classes.Any(x => x.Number == @class.Number && x.Letter == @class.Letter))
+            if (context.Klasses.Any(x => x.number == @class.number && x.letter == @class.letter))
                 return BadRequest(new { errorText = "Такой класс уже существует" });
 
-            dbClass.Create(new Class { Number = @class.Number, Letter = @class.Letter });
+            dbKlass.Create(new Klass { number = @class.number, letter = @class.letter });
             await context.SaveChangesAsync();
             return Ok(@class);
         }
 
         [Route("editClass")]
         [HttpPut]
-        public async Task<ActionResult<Class>> EditClass(Class @class)
+        public async Task<ActionResult<Klass>> EditClass(Klass @class)
         {
             if (@class == null)
             {
                 return BadRequest();
             }
-            if (!context.Classes.Any(x => x.ClassId == @class.ClassId))
+            if (!context.Klasses.Any(x => x.classid == @class.classid))
             {
                 return NotFound();
             }
 
-            dbClass.Update(@class);
+            dbKlass.Update(@class);
             await context.SaveChangesAsync();
 
             return Ok(@class);
         }
 
-        [Route("deleteClass")]
+        [Route("deleteClass/{id}")]
         [HttpPost]
         public async Task<IActionResult> DeleteClass(int id)
         {
-            if (id != null)
-            {
-                dbClass.Delete(id);
+                dbKlass.Delete(id);
                 await context.SaveChangesAsync();
                 return Ok();
-            }
-            return NotFound();
         }
         #endregion
 
-        //CED Subject
-        #region
+        #region CED Subject
         [Route("createSubject")]
         [HttpPost]
         public async Task<ActionResult<Subject>> CreateSub(Subject subject)
@@ -246,18 +252,13 @@ namespace ApiDairy.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteSub(int id)
         {
-            if (id != null)
-            {
                 dbSub.Delete(id);
                 await context.SaveChangesAsync();
                 return Ok(id);
-            }
-            return NotFound();
         }
         #endregion
 
-        //CED Timeatable
-        #region
+        #region CED Timeatable
         [Route("createTimetable")]
         [HttpPost]
         public ActionResult CreateTimetable(Timetable timetable)
@@ -265,10 +266,10 @@ namespace ApiDairy.Controllers
             if (timetable == null)
                 return BadRequest();
 
-            if (context.Timetables.Any(x => x.Id == timetable.Id))
+            if (context.Timetables.Any(x => x.timetableid == timetable.timetableid))
                 return BadRequest(new { errorText = "Такое расписание уже сушествует" });
 
-            dbTT.Create(new Timetable {Class = timetable.Class, Office = timetable.Office, Date = timetable.Date, Lesson = timetable.Lesson, Subject = timetable.Subject, User = timetable.User });
+            dbTT.Create(new Timetable { Class = timetable.Class, Office = timetable.Office, Date = timetable.Date, Lesson = timetable.Lesson, Subject = timetable.Subject, User = timetable.User });
             dbTT.Save();
             return Ok(timetable);
         }
@@ -281,7 +282,7 @@ namespace ApiDairy.Controllers
             {
                 return BadRequest();
             }
-            if (!context.Timetables.Any(x => x.Id == timetable.Id))
+            if (!context.Timetables.Any(x => x.timetableid == timetable.timetableid))
             {
                 return NotFound();
             }
@@ -296,15 +297,95 @@ namespace ApiDairy.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteTimetable(int id)
         {
-            if (id != null)
-            {
                 dbTT.Delete(id);
                 await context.SaveChangesAsync();
                 return Ok();
-            }
-            return NotFound();
         }
         #endregion
-    }
 
+        #region Reports
+        #region SubReports
+        private const string TABLE_NAME = "subject";
+
+        [Route("getUserReport")]
+        [HttpGet]
+        public async Task<IActionResult> GetUserReport(int id)
+        {
+            using (DataContext db = new DataContext())
+            {
+                var marks = from Mark in db.Marks
+                            join user in db.users on Mark.userid equals user.userid
+                            select new
+                            {
+                                mark = Mark.mark,
+                                date = Mark.date,
+                                subjectid = Mark.subjectid,
+                                firts_name = user.first_name,
+                                middle_name = user.middle_name,
+                                last_name = user.last_name
+                            };
+
+                var klass = from Klass in db.Klasses
+                                 join user in db.users on Klass.userid equals user.userid
+                                 select new
+                                 {
+                                     number = Klass.number,
+                                     letter = Klass.letter,
+                                 };
+                return null;
+;
+            }
+
+            /*string commandText = $"SELECT * FROM class, mark INNER JOIN subjectid = @id";
+            await using (NpgsqlCommand cmd = new NpgsqlCommand(commandText, connection))
+            {
+                cmd.Parameters.AddWithValue("id", id);
+
+                await using (NpgsqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    while (await reader.ReadAsync())
+                    {
+                        Mark mark = ReadMark(reader);
+                        Klass klass = ReadKlass(reader);
+                        return mark, klass;
+                    }
+            }
+            return null;*/
+        }
+
+        /*private static Mark ReadMark(NpgsqlDataReader reader)
+        {
+            int? markid = reader["markid"] as int?;
+            DateTime? date = reader["date"] as DateTime?;
+            int? subjectid = reader["subjectid"] as int?;
+            int? Mark = reader["mark"] as int?;
+            List<User> user = reader["user"] as List<User>;
+
+            Mark mark = new Mark
+            {
+                markid = markid.Value,
+                date = date.Value,
+                subjectid = subjectid.Value,
+                mark = Mark.Value,
+                users = user
+            };
+            return mark;
+        }
+
+        private static Klass ReadKlass(NpgsqlDataReader reader)
+        {
+            int? classid = reader["classid"] as int?;
+            int? number = reader["number"] as int?;
+            string letter = reader["lertter"] as string;
+
+            Klass klass = new Klass
+            {
+                classid = classid.Value,
+                number = number.Value,
+                letter = letter,
+            };
+            return klass;
+        }*/
+        #endregion
+        #endregion
+    }
 }

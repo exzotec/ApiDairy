@@ -5,50 +5,49 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace ApiDairy.Data.Repositories
 {
-    public class KlassRepository : IBaseRepository<Klass>
+    public class SubjectRepository : IBaseRepository<Subject>
     {
-        private DataContext dbKlass;
+        private DataContext dbSub;
 
-        public KlassRepository(DataContext _dbKlass)
+        public SubjectRepository(DataContext _dbSub)
         {
-            dbKlass = _dbKlass;
+            dbSub = _dbSub;
         }
 
         #region CRUD+
-        public void Create(Klass @class)
+        public void Create(Subject sub)
         {
-            dbKlass.Classes.Add(@class);
+            dbSub.Subjects.Add(sub);
         }
 
         public void Delete(int id)
         {
-            Klass c = dbKlass.Classes.Find(id);
-            if (c != null)
-                dbKlass.Classes.Remove(c);
+            Subject s = dbSub.Subjects.Find(id);
+            if (s != null)
+                dbSub.Subjects.Remove(s);
         }
 
-        public Klass Get(string id)
+        public Subject Get(string id)
         {
-            return dbKlass.Classes.Find(id);
+            return dbSub.Subjects.Find(id);
         }
 
-        public async Task<ActionResult<IEnumerable<Klass>>> GetAll()
+        public async Task<ActionResult<IEnumerable<Subject>>> GetAll()
         {
-            return await dbKlass.Classes.ToListAsync();
+            return await dbSub.Subjects.ToListAsync();
         }
 
         public void Save()
         {
-            dbKlass.SaveChanges();
+            dbSub.SaveChanges();
         }
 
-        public void Update(Klass @class)
+        public void Update(Subject sub)
         {
-            dbKlass.Entry(@class).State = EntityState.Modified;
+            dbSub.Entry(sub).State = EntityState.Modified;
         }
         #endregion
 
@@ -61,7 +60,7 @@ namespace ApiDairy.Data.Repositories
             {
                 if (disposing)
                 {
-                    dbKlass.Dispose();
+                    dbSub.Dispose();
                 }
             }
             this.disposed = true;
@@ -73,6 +72,5 @@ namespace ApiDairy.Data.Repositories
             GC.SuppressFinalize(this);
         }
         #endregion
-
     }
 }

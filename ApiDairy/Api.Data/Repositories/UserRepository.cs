@@ -5,50 +5,49 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace ApiDairy.Data.Repositories
 {
-    public class KlassRepository : IBaseRepository<Klass>
+    public class UserRepository : IBaseRepository<User>
     {
-        private DataContext dbKlass;
+        private DataContext dbUser;
 
-        public KlassRepository(DataContext _dbKlass)
+        public UserRepository(DataContext _dbUser)
         {
-            dbKlass = _dbKlass;
+            dbUser = _dbUser;
         }
 
         #region CRUD+
-        public void Create(Klass @class)
+        public void Create(User user) //
         {
-            dbKlass.Classes.Add(@class);
+            dbUser.users.Add(user);
         }
 
-        public void Delete(int id)
+        public void Delete(int id) //
         {
-            Klass c = dbKlass.Classes.Find(id);
-            if (c != null)
-                dbKlass.Classes.Remove(c);
+            User user = dbUser.users.Find(id);
+            if (user != null)
+                dbUser.users.Remove(user);
         }
 
-        public Klass Get(string id)
+        public User Get(string id) //
         {
-            return dbKlass.Classes.Find(id);
+            return dbUser.users.Find(id);
         }
 
-        public async Task<ActionResult<IEnumerable<Klass>>> GetAll()
+        public async Task<ActionResult<IEnumerable<User>>> GetAll() //
         {
-            return await dbKlass.Classes.ToListAsync();
+            return await dbUser.users.ToListAsync();
         }
 
-        public void Save()
+        public void Save() //
         {
-            dbKlass.SaveChanges();
+            dbUser.SaveChanges();
         }
 
-        public void Update(Klass @class)
+        public void Update(User user) //
         {
-            dbKlass.Entry(@class).State = EntityState.Modified;
+            dbUser.Entry(user).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
         }
         #endregion
 
@@ -61,7 +60,7 @@ namespace ApiDairy.Data.Repositories
             {
                 if (disposing)
                 {
-                    dbKlass.Dispose();
+                    dbUser.Dispose();
                 }
             }
             this.disposed = true;
@@ -73,6 +72,5 @@ namespace ApiDairy.Data.Repositories
             GC.SuppressFinalize(this);
         }
         #endregion
-
     }
 }

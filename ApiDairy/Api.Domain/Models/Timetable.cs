@@ -8,12 +8,12 @@ namespace ApiDairy.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int timetableid { get; set; }
+        public string Id { get; set; }
         public string Date { get; set; }
         public int Lesson { get; set; }
         public Subject Subject { get; set; }
         public User User { get; set; }
-        public Klass Class { get; set; }
+        public Class Class { get; set; }
         public Office Office { get; set; }
     }
 }

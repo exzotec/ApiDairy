@@ -5,50 +5,49 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace ApiDairy.Data.Repositories
 {
-    public class KlassRepository : IBaseRepository<Klass>
+    public class OfficeRepository : IBaseRepository<Office>
     {
-        private DataContext dbKlass;
+        private DataContext dbOffice;
 
-        public KlassRepository(DataContext _dbKlass)
+        public OfficeRepository(DataContext _dbOffice)
         {
-            dbKlass = _dbKlass;
+            dbOffice = _dbOffice;
         }
 
         #region CRUD+
-        public void Create(Klass @class)
+        public void Create(Office office)
         {
-            dbKlass.Classes.Add(@class);
+            dbOffice.Offices.Add(office);
         }
 
         public void Delete(int id)
         {
-            Klass c = dbKlass.Classes.Find(id);
-            if (c != null)
-                dbKlass.Classes.Remove(c);
+            Office office = dbOffice.Offices.Find(id);
+            if (office != null)
+                dbOffice.Offices.Remove(office);
         }
 
-        public Klass Get(string id)
+        public Office Get(string id)
         {
-            return dbKlass.Classes.Find(id);
+            return dbOffice.Offices.Find(id);
         }
 
-        public async Task<ActionResult<IEnumerable<Klass>>> GetAll()
+        public async Task<ActionResult<IEnumerable<Office>>> GetAll()
         {
-            return await dbKlass.Classes.ToListAsync();
+            return await dbOffice.Offices.ToListAsync();
         }
 
         public void Save()
         {
-            dbKlass.SaveChanges();
+            dbOffice.SaveChanges();
         }
 
-        public void Update(Klass @class)
+        public void Update(Office office)
         {
-            dbKlass.Entry(@class).State = EntityState.Modified;
+            dbOffice.Entry(office).State = EntityState.Modified;
         }
         #endregion
 
@@ -61,7 +60,7 @@ namespace ApiDairy.Data.Repositories
             {
                 if (disposing)
                 {
-                    dbKlass.Dispose();
+                    dbOffice.Dispose();
                 }
             }
             this.disposed = true;
@@ -73,6 +72,5 @@ namespace ApiDairy.Data.Repositories
             GC.SuppressFinalize(this);
         }
         #endregion
-
     }
 }
